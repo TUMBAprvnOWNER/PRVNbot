@@ -6,7 +6,7 @@ from aiogram.filters import Command
 from flask import Flask
 from threading import Thread
 
-BOT_TOKEN = os.getenv("8728313424:AAFK7J2_DK0SUkMBX2BckxRXTIdvJZRr0k4")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHANNEL_ID = "@prvn_oficial"
 
 bot = Bot(token=BOT_TOKEN)
