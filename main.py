@@ -33,7 +33,7 @@ async def check_sub(user_id):
 
 @dp.message(Command("start"))
 async def start(msg: types.Message):
-    await msg.answer("Подпишись на канал и отправь код")
+    await msg.answer("Подпишись на канал @prvn_oficial и отправь код")
 
 @dp.message()
 async def handle(msg: types.Message):
