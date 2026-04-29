@@ -3,8 +3,6 @@ import asyncio
 import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from flask import Flask
-from threading import Thread
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHANNEL_ID = "@prvn_oficial"
@@ -12,6 +10,7 @@ CHANNEL_ID = "@prvn_oficial"
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
+# База данных
 conn = sqlite3.connect("db.db")
 cur = conn.cursor()
 
@@ -24,6 +23,7 @@ for c in codes:
     cur.execute("INSERT OR IGNORE INTO codes VALUES (?,0)", (c,))
 conn.commit()
 
+# Проверка подписки
 async def check_sub(user_id):
     try:
         member = await bot.get_chat_member(CHANNEL_ID, user_id)
@@ -31,6 +31,7 @@ async def check_sub(user_id):
     except:
         return False
 
+# Команды
 @dp.message(Command("start"))
 async def start(msg: types.Message):
     await msg.answer("Подпишись на канал @prvn_oficial и отправь код")
@@ -60,24 +61,13 @@ async def handle(msg: types.Message):
     cur.execute("INSERT INTO users VALUES (?)", (user_id,))
     conn.commit()
 
-    await msg.answer("✅ Код принят! Отправь скриншот, подтверждающий наличие у тебя в кошельке PRVN нашему администратору @PRVN_admin, он отправит тебе 5000 PRVN. Спасибо что ты с нами!")
+    await msg.answer(
+        "✅ Код принят! Отправь скриншот, подтверждающий наличие у тебя в кошельке PRVN нашему администратору @PRVN_admin, он отправит тебе 5000 PRVN."
+    )
 
-# Flask
-app = Flask('')
-
-@app.route('/')
-def home():
-    return "alive"
-
-def run_web():
-    app.run(host='0.0.0.0', port=3000)
-
-def keep_alive():
-    t = Thread(target=run_web)
-    t.start()
-
+# 🚀 Запуск
 async def main():
-    keep_alive()
+    await bot.delete_webhook(drop_pending_updates=True)  # важно
     print("🚀 Бот запущен")
     await dp.start_polling(bot)
 
