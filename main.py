@@ -65,7 +65,7 @@ async def check_sub(user_id):
 async def start(msg: types.Message):
 
     await msg.answer(
-        "Подпишись на канал @prvn_oficial и отправь код"
+        "Подпишись на канал @prvn_oficial и отправь код (Subscribe to the @prvn_oficial channel and send the code)"
     )
 
 
