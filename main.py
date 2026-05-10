@@ -21,22 +21,23 @@ conn = sqlite3.connect(
 
 cur = conn.cursor()
 
+# СТАРАЯ СТРУКТУРА БАЗЫ (оставляем used)
 cur.execute("""
 CREATE TABLE IF NOT EXISTS codes (
     code TEXT PRIMARY KEY,
     used INTEGER DEFAULT 0
 )
 """)
+
 conn.commit()
 
-# КОД (один и тот же навсегда)
+# КОДЫ
 codes = ["dropmeprvn"]
 
 for c in codes:
-  cur.execute(
-    "INSERT OR IGNORE INTO codes (code) VALUES (?)",
-    (c,)
-)
+    cur.execute(
+        "INSERT OR IGNORE INTO codes (code) VALUES (?)",
+        (c,)
     )
 
 conn.commit()
@@ -44,7 +45,6 @@ conn.commit()
 
 # ПРОВЕРКА ПОДПИСКИ
 async def check_sub(user_id):
-
     try:
         member = await bot.get_chat_member(
             CHANNEL_ID,
@@ -70,11 +70,9 @@ async def start(msg: types.Message):
     )
 
 
-# ОБРАБОТКА КОДА
+# ОБРАБОТКА СООБЩЕНИЙ
 @dp.message()
 async def handle(msg: types.Message):
-
-    user_id = msg.from_user.id
 
     code = (
         msg.text
@@ -83,7 +81,9 @@ async def handle(msg: types.Message):
         .replace(" ", "")
     )
 
-    # Проверка подписки
+    user_id = msg.from_user.id
+
+    # ПРОВЕРКА ПОДПИСКИ
     if not await check_sub(user_id):
 
         await msg.answer(
@@ -92,7 +92,7 @@ async def handle(msg: types.Message):
 
         return
 
-    # Проверка кода
+    # ПРОВЕРКА КОДА
     cur.execute(
         "SELECT code FROM codes WHERE code=?",
         (code,)
@@ -103,8 +103,7 @@ async def handle(msg: types.Message):
     if not row:
 
         await msg.answer(
-            "❌ Код неверный (The code is incorrect)"
-
+            "❌ Код неверный"
         )
 
         return
@@ -112,7 +111,7 @@ async def handle(msg: types.Message):
     # УСПЕХ
     await msg.answer(
         "✅ Код принят!\n\n"
-        "Отправь скриншот, подтверждающий наличие у тебя в кошельке PRVN нашему администратору @PRVN_admin, он отправит тебе 10.000 PRVN. Спасибо, что ты с нами! (Send a screenshot confirming you have PRVN in your wallet to our administrator @PRVN_admin, and they'll send you 10.000 PRVN. Thank you for being with us!)"
+        "Отправь скриншот, подтверждающий наличие у тебя в кошельке PRVN нашему администратору @PRVN_admin, он отправит тебе 5000 PRVN. Спасибо, что ты с нами! (Send a screenshot confirming you have PRVN in your wallet to our administrator @PRVN_admin, and they'll send you 5000 PRVN. Thank you for being with us!)"
     )
 
 
