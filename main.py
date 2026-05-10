@@ -111,7 +111,7 @@ async def handle(msg: types.Message):
     # УСПЕХ
     await msg.answer(
         "✅ Код принят!\n\n"
-        "Отправь скриншот, подтверждающий наличие у тебя в кошельке PRVN нашему администратору @PRVN_admin, он отправит тебе 5000 PRVN. Спасибо, что ты с нами! (Send a screenshot confirming you have PRVN in your wallet to our administrator @PRVN_admin, and they'll send you 5000 PRVN. Thank you for being with us!)"
+        "Отправь скриншот, подтверждающий наличие у тебя в кошельке PRVN нашему администратору @PRVN_admin, он отправит тебе 10.000 PRVN. Спасибо, что ты с нами! (Send a screenshot confirming you have PRVN in your wallet to our administrator @PRVN_admin, and they'll send you 10.000 PRVN. Thank you for being with us!)"
     )
 
 
