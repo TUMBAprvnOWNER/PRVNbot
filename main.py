@@ -11,39 +11,39 @@ CHANNEL_ID = "@prvn_oficial"
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# База данных
-conn = sqlite3.connect("/data/db.db")
+# БАЗА
+os.makedirs("/data", exist_ok=True)
+
+conn = sqlite3.connect(
+    "/data/db.db",
+    check_same_thread=False
+)
+
 cur = conn.cursor()
 
 cur.execute("""
 CREATE TABLE IF NOT EXISTS codes (
-    code TEXT PRIMARY KEY,
-    used INTEGER DEFAULT 0
-)
-""")
-
-cur.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    user_id INTEGER PRIMARY KEY
+    code TEXT PRIMARY KEY
 )
 """)
 
 conn.commit()
 
-# Один код, но принимается в любом регистре и с пробелами
+# КОД (один и тот же навсегда)
 codes = ["dropmeprvn"]
 
 for c in codes:
     cur.execute(
-        "INSERT OR IGNORE INTO codes VALUES (?, 0)",
+        "INSERT OR IGNORE INTO codes VALUES (?)",
         (c,)
     )
 
 conn.commit()
 
 
-# Проверка подписки
+# ПРОВЕРКА ПОДПИСКИ
 async def check_sub(user_id):
+
     try:
         member = await bot.get_chat_member(
             CHANNEL_ID,
@@ -60,7 +60,7 @@ async def check_sub(user_id):
         return False
 
 
-# /start
+# /START
 @dp.message(Command("start"))
 async def start(msg: types.Message):
 
@@ -69,13 +69,12 @@ async def start(msg: types.Message):
     )
 
 
-# Обработка сообщений
+# ОБРАБОТКА КОДА
 @dp.message()
 async def handle(msg: types.Message):
 
     user_id = msg.from_user.id
 
-    # Нормализация кода
     code = (
         msg.text
         .strip()
@@ -94,7 +93,7 @@ async def handle(msg: types.Message):
 
     # Проверка кода
     cur.execute(
-        "SELECT used FROM codes WHERE code=?",
+        "SELECT code FROM codes WHERE code=?",
         (code,)
     )
 
@@ -102,55 +101,23 @@ async def handle(msg: types.Message):
 
     if not row:
 
-        await msg.answer("❌ Код неверный (The code is incorrect)")
-        return
-
-    # Код уже использован
-    if row[0] == 1:
-
         await msg.answer(
-            "❌ Этот код уже использован (This code has already been used)"
+            "❌ Код неверный (The code is incorrect)"
+
         )
 
         return
 
-    # Проверка пользователя
-    cur.execute(
-        "SELECT * FROM users WHERE user_id=?",
-        (user_id,)
-    )
-
-    if cur.fetchone():
-
-        await msg.answer(
-            "❌ Код уже был активирован"
-        )
-
-        return
-
-    # Активация
-    cur.execute(
-        "UPDATE codes SET used=1 WHERE code=?",
-        (code,)
-    )
-
-    cur.execute(
-        "INSERT INTO users VALUES (?)",
-        (user_id,)
-    )
-
-    conn.commit()
-
+    # УСПЕХ
     await msg.answer(
-        "✅ Код принят! (Code accepted!)\n\n"
+        "✅ Код принят!\n\n"
         "Отправь скриншот, подтверждающий наличие у тебя в кошельке PRVN нашему администратору @PRVN_admin, он отправит тебе 5000 PRVN. Спасибо, что ты с нами! (Send a screenshot confirming you have PRVN in your wallet to our administrator @PRVN_admin, and they'll send you 5000 PRVN. Thank you for being with us!)"
     )
 
 
-# Запуск
+# MAIN
 async def main():
 
-    # Удаляем webhook
     await bot.delete_webhook(
         drop_pending_updates=True
     )
