@@ -23,19 +23,20 @@ cur = conn.cursor()
 
 cur.execute("""
 CREATE TABLE IF NOT EXISTS codes (
-    code TEXT PRIMARY KEY
+    code TEXT PRIMARY KEY,
+    used INTEGER DEFAULT 0
 )
 """)
-
 conn.commit()
 
 # КОД (один и тот же навсегда)
 codes = ["dropmeprvn"]
 
 for c in codes:
-    cur.execute(
-        "INSERT OR IGNORE INTO codes VALUES (?)",
-        (c,)
+  cur.execute(
+    "INSERT OR IGNORE INTO codes (code) VALUES (?)",
+    (c,)
+)
     )
 
 conn.commit()
